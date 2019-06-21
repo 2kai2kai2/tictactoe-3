@@ -1,14 +1,55 @@
 package tickTackToe;
 
 public class Board {
-	private int[][][] board = new int[9][9][9];
-	// board[out][mid][in]
-	private int[] lastMove = new int[] { 0, 0, 0 };
-	// [0] = outermost grid, [1] = middle grid, and [2] = inner grid locations
 
 	public final int BLANK = 0;
 	public final int X = 1;
 	public final int O = 2;
+
+	private int[][][] board = new int[9][9][9];
+	// board[out][mid][in]
+	private int[] lastMove = new int[] { 0, 0, 0 };
+	// [0] = outermost grid, [1] = middle grid, and [2] = inner grid locations
+	private int lastPlayer = 2; // Start with x
+
+	/**
+	 * Places a marker on the board at any location.
+	 * 
+	 * @param locOuter  The outer location (0-8)
+	 * @param locMiddle The middle location (0-8) within the outer
+	 * @param locInner  The inner location (0-8) within the middle
+	 */
+	public void place(int locOuter, int locMiddle, int locInner) {
+		set(locOuter, locMiddle, locInner, nextPlayer());
+		setLastMove(locOuter, locMiddle, locInner);
+	}
+	
+	public void place(int[] locs) {
+		if (locs.length == 3) {
+			if (locs[0] < 9 && locs[1] < 9 && locs[2] < 9) {
+				place(locs[0], locs[1], locs[2]);
+			}
+		}
+	}
+	
+	/**
+	 * Places a marker on the board at the next location in the board.
+	 * 
+	 * @param locInner The integer location (0-8) within the current middle square.
+	 */
+	public void place(int locInner) {
+		place(lastMiddle(), lastInner(), locInner);
+	}
+
+	public int nextPlayer() {
+		int a = lastPlayer;
+		if (lastPlayer == X) {
+			lastPlayer = O;
+		} else if (lastPlayer == O) {
+			lastPlayer = X;
+		}
+		return a;
+	}
 
 	public int lastOuter() {
 		return lastMove[0];
@@ -21,15 +62,19 @@ public class Board {
 	public int lastInner() {
 		return lastMove[2];
 	}
-	
+
 	public void setLastMove(int[] move) {
 		if (move.length == 3) {
-			if (move[0] < 9 && move [1] < 9 && move [2] < 9) {
+			if (move[0] < 9 && move[1] < 9 && move[2] < 9) {
 				lastMove = move;
 			}
 		}
 	}
 	
+	public void setLastMove(int outer, int middle, int inner) {
+		setLastMove(new int[] {outer, middle, inner});
+	}
+
 	public String symbolOf(int value) {
 		if (value == 1) {
 			return "X";

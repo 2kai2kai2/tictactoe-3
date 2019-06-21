@@ -165,35 +165,35 @@ public class Board {
 		return -1;
 	}
 
-	public int displayBoardX(int out, int mid, int in) {
+	public static int displayBoardX(int out, int mid, int in) {
 		if (out < 9 && mid < 9 && in < 9) {
 			return out % 3 * 9 + mid % 3 * 3 + in % 3;
 		}
 		return -1;
 	}
 
-	public int displayBoardY(int out, int mid, int in) {
+	public static int displayBoardY(int out, int mid, int in) {
 		if (out < 9 && mid < 9 && in < 9) {
 			return out / 3 * 9 + mid / 3 * 3 + in / 3;
 		}
 		return -1;
 	}
 
-	public int numBoardOuter(int x, int y) {
+	public static int numBoardOuter(int x, int y) {
 		if (x < 3 * 3 * 3 && y < 3 * 3 * 3) {
 			return x / 9 + y / 9 * 3;
 		}
 		return -1;
 	}
 
-	public int numBoardMiddle(int x, int y) {
+	public static int numBoardMiddle(int x, int y) {
 		if (x < 3 * 3 * 3 && y < 3 * 3 * 3) {
 			return x % 9 / 3 + y % 9 / 3 * 3;
 		}
 		return -1;
 	}
 
-	public int numBoardInner(int x, int y) {
+	public static int numBoardInner(int x, int y) {
 		if (x < 3 * 3 * 3 && y < 3 * 3 * 3) {
 			return x % 3 + y % 3 * 3;
 		}

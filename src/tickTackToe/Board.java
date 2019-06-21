@@ -1,13 +1,35 @@
 package tickTackToe;
 
 public class Board {
-	public int[][][] board = new int[9][9][9];
+	private int[][][] board = new int[9][9][9];
 	// board[out][mid][in]
+	private int[] lastMove = new int[] { 0, 0, 0 };
+	// [0] = outermost grid, [1] = middle grid, and [2] = inner grid locations
 
 	public final int BLANK = 0;
 	public final int X = 1;
 	public final int O = 2;
 
+	public int lastOuter() {
+		return lastMove[0];
+	}
+
+	public int lastMiddle() {
+		return lastMove[1];
+	}
+
+	public int lastInner() {
+		return lastMove[2];
+	}
+	
+	public void setLastMove(int[] move) {
+		if (move.length == 3) {
+			if (move[0] < 9 && move [1] < 9 && move [2] < 9) {
+				lastMove = move;
+			}
+		}
+	}
+	
 	public String symbolOf(int value) {
 		if (value == 1) {
 			return "X";
@@ -19,6 +41,7 @@ public class Board {
 			return "-";
 		}
 	}
+
 	/**
 	 * Sets all values on the board back to blank (0).
 	 */
@@ -72,7 +95,10 @@ public class Board {
 	 * @return
 	 */
 	public int get(int out, int mid, int in) {
-		return board[out][mid][in];
+		if (out < 9 && mid < 9 && in < 9) {
+			return board[out][mid][in];
+		}
+		return -1;
 	}
 
 	/**
@@ -93,7 +119,41 @@ public class Board {
 		// If it is not an x, y pair, return -1
 		return -1;
 	}
-	
+
+	public int displayBoardX(int out, int mid, int in) {
+		if (out < 9 && mid < 9 && in < 9) {
+			return out % 3 * 9 + mid % 3 * 3 + in % 3;
+		}
+		return -1;
+	}
+
+	public int displayBoardY(int out, int mid, int in) {
+		if (out < 9 && mid < 9 && in < 9) {
+			return out / 3 * 9 + mid / 3 * 3 + in / 3;
+		}
+		return -1;
+	}
+
+	public int numBoardOuter(int x, int y) {
+		if (x < 3 * 3 * 3 && y < 3 * 3 * 3) {
+			return x / 9 + y / 9 * 3;
+		}
+		return -1;
+	}
+
+	public int numBoardMiddle(int x, int y) {
+		if (x < 3 * 3 * 3 && y < 3 * 3 * 3) {
+			return x % 9 / 3 + y % 9 / 3 * 3;
+		}
+		return -1;
+	}
+
+	public int numBoardInner(int x, int y) {
+		if (x < 3 * 3 * 3 && y < 3 * 3 * 3) {
+			return x % 3 + y % 3 * 3;
+		}
+		return -1;
+	}
 
 	/**
 	 * Creates a text-based representation of the board.
@@ -106,8 +166,10 @@ public class Board {
 		for (int i = 0; i < 3 * 3 * 3; i++) {
 			rows[i] = "[ ";
 			for (int j = 0; j < 3 * 3 * 3; j++) {
-				rows[i] += symbolOf(get(new int[]{j / 9, i / 9}, new int[]{j % 9 / 3, i % 9 / 3}, new int[]{j % 3, i % 3}));
-				if (j % 9 == 8) {
+				rows[i] += symbolOf(get(numBoardOuter(j, i), numBoardMiddle(j, i), numBoardInner(j, i)));
+				if (j % 3 == 2 && numBoardOuter(j, i) == lastMiddle() && numBoardMiddle(j, i) == lastInner()) {
+					rows[i] += " <";
+				} else if (j % 9 == 8) {
 					rows[i] += " [";
 				} else if (j % 3 == 2) {
 					rows[i] += " |";

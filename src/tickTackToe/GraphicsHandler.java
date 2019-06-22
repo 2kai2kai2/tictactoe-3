@@ -136,6 +136,25 @@ public class GraphicsHandler extends Canvas implements Runnable {
 				}
 			}
 		}
+		
+		if (board.lastInner() != -1 && board.lastMiddle() != -1 && board.lastOuter() != -1) {
+			int next1X = board.displayBoardX(board.lastMiddle(), board.lastInner(), 0);
+			int next1Y = board.displayBoardY(board.lastMiddle(), board.lastInner(), 0);
+			
+			g.setColor(Color.green);
+			g.drawRect((int) (next1X * (width / 27.0)), (int) (next1Y * (height / 27.0)), width / 9, height / 9);
+			g.drawRect((int) (next1X * (width / 27.0)) + 1, (int) (next1Y * (height / 27.0)) + 1, width / 9 - 2,
+					height / 9 - 2);
+			
+			int next2X = board.displayBoardX(board.lastInner(), 0, 0);
+			int next2Y = board.displayBoardY(board.lastInner(), 0, 0);
+			
+			g.setColor(Color.BLACK);
+			g.drawRect((int) (next2X * (width / 27.0)), (int) (next2Y * (width / 27.0) - next2Y), width / 3,
+					height / 3);
+			g.drawRect((int) (next2X * (width / 27.0)) + 1, (int) (next2Y * (width / 27.0) - next2Y) + 1, width / 3 - 2,
+					height / 3 - 2);
+		}
 
 		if (display.isFocused() && this.getMousePosition() != null) {
 			double mouseX = display.displayBoardX((int) this.getMousePosition().getX());

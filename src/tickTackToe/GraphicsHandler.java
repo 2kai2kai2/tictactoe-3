@@ -16,9 +16,9 @@ public class GraphicsHandler extends Canvas implements Runnable {
 
 	public boolean needUpdate = true;
 	private Thread thread;
-	
+
 	private final int FPSCAP = 120;
-	
+
 	private long lastMS = 0;
 
 	public GraphicsHandler(Board displayBoard, Display display1) {
@@ -38,7 +38,7 @@ public class GraphicsHandler extends Canvas implements Runnable {
 		thread = new Thread(this);
 		thread.start();
 	}
-	
+
 	@Override
 	public void run() {
 		while (true) {
@@ -137,11 +137,11 @@ public class GraphicsHandler extends Canvas implements Runnable {
 				}
 			}
 		}
-		
+
 		if (board.lastInner() != -1 && board.lastMiddle() != -1 && board.lastOuter() != -1) {
 			int next1X = board.displayBoardX(board.lastMiddle(), board.lastInner(), 0);
 			int next1Y = board.displayBoardY(board.lastMiddle(), board.lastInner(), 0);
-			
+
 			if (board.currentPlayer() == board.O) {
 				g.setColor(Color.GREEN);
 			} else if (board.currentPlayer() == board.X) {
@@ -150,10 +150,10 @@ public class GraphicsHandler extends Canvas implements Runnable {
 			g.drawRect((int) (next1X * (width / 27.0)), (int) (next1Y * (height / 27.0)), width / 9, height / 9);
 			g.drawRect((int) (next1X * (width / 27.0)) + 1, (int) (next1Y * (height / 27.0)) + 1, width / 9 - 2,
 					height / 9 - 2);
-			
+
 			int next2X = board.displayBoardX(board.lastInner(), 0, 0);
 			int next2Y = board.displayBoardY(board.lastInner(), 0, 0);
-			
+
 			if (board.currentPlayer() == board.O) {
 				g.setColor(Color.ORANGE);
 			} else if (board.currentPlayer() == board.X) {
@@ -169,25 +169,30 @@ public class GraphicsHandler extends Canvas implements Runnable {
 			Point mouse = this.getMousePosition();
 			double mouseX = display.displayBoardX((int) mouse.getX());
 			double mouseY = display.displayBoardY((int) mouse.getY());
+			// So that it only shows up if the mouse is in the current select-able space, or
+			// if there is no selection
+			if ((board.lastInner() == -1 && board.lastMiddle() == -1 && board.lastOuter() == -1)
+					|| (board.displayBoardX(board.lastMiddle(), board.lastInner(), 0) == mouseX - mouseX % 3
+							&& board.displayBoardY(board.lastMiddle(), board.lastInner(), 0) == mouseY - mouseY % 3)) {
+				double next1X = mouseX % 9 * 3;
+				double next1Y = mouseY % 9 * 3;
+				double next2X = mouseX % 3 * 9;
+				double next2Y = mouseY % 3 * 9;
 
-			double next1X = mouseX % 9 * 3;
-			double next1Y = mouseY % 9 * 3;
-			double next2X = mouseX % 3 * 9;
-			double next2Y = mouseY % 3 * 9;
-
-			g.setColor(Color.CYAN);
-			g.drawRect((int) (mouseX * (width / 27.0)), (int) (mouseY * (height / 27.0)), width / 27, height / 27);
-			g.drawRect((int) (mouseX * (width / 27.0)) + 1, (int) (mouseY * (height / 27.0)) + 1, width / 27 - 2,
-					height / 27 - 2);
-			g.setColor(new Color(50, 50, 255));
-			g.drawRect((int) (next1X * (width / 27.0)), (int) (next1Y * (height / 27.0)), width / 9, height / 9);
-			g.drawRect((int) (next1X * (width / 27.0)) + 1, (int) (next1Y * (height / 27.0)) + 1, width / 9 - 2,
-					height / 9 - 2);
-			g.setColor(Color.BLUE);
-			g.drawRect((int) (next2X * (width / 27.0)), (int) (next2Y * (width / 27.0) - next2Y), width / 3,
-					height / 3);
-			g.drawRect((int) (next2X * (width / 27.0)) + 1, (int) (next2Y * (width / 27.0) - next2Y) + 1, width / 3 - 2,
-					height / 3 - 2);
+				g.setColor(Color.CYAN);
+				g.drawRect((int) (mouseX * (width / 27.0)), (int) (mouseY * (height / 27.0)), width / 27, height / 27);
+				g.drawRect((int) (mouseX * (width / 27.0)) + 1, (int) (mouseY * (height / 27.0)) + 1, width / 27 - 2,
+						height / 27 - 2);
+				g.setColor(new Color(50, 50, 255));
+				g.drawRect((int) (next1X * (width / 27.0)), (int) (next1Y * (height / 27.0)), width / 9, height / 9);
+				g.drawRect((int) (next1X * (width / 27.0)) + 1, (int) (next1Y * (height / 27.0)) + 1, width / 9 - 2,
+						height / 9 - 2);
+				g.setColor(Color.BLUE);
+				g.drawRect((int) (next2X * (width / 27.0)), (int) (next2Y * (width / 27.0) - next2Y), width / 3,
+						height / 3);
+				g.drawRect((int) (next2X * (width / 27.0)) + 1, (int) (next2Y * (width / 27.0) - next2Y) + 1,
+						width / 3 - 2, height / 3 - 2);
+			}
 		}
 	}
 }

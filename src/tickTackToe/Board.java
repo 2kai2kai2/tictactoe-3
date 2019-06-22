@@ -99,6 +99,10 @@ public class Board {
 		}
 		return a;
 	}
+	
+	public int currentPlayer() {
+		return lastPlayer;
+	}
 
 	public int lastOuter() {
 		return lastMove[0];

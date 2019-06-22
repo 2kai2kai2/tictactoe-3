@@ -5,9 +5,12 @@ public class Board {
 	public final int BLANK = 0;
 	public final int X = 1;
 	public final int O = 2;
+	public final int TIE = 3;
 
 	private int[][][] board = new int[9][9][9];
 	// board[out][mid][in]
+
+	public int winner = 0;
 
 	private int[][] wonMiddles = new int[9][9];
 	private int[] wonOuters = new int[9];
@@ -25,7 +28,12 @@ public class Board {
 	 */
 	public void place(int locOuter, int locMiddle, int locInner) {
 		set(locOuter, locMiddle, locInner, nextPlayer());
-		setLastMove(locOuter, locMiddle, locInner);
+		checkWins();
+		if (wonMiddles[locMiddle][locInner] == 0 && wonOuters[locMiddle] == 0) {
+			setLastMove(locOuter, locMiddle, locInner);
+		} else {
+			setLastMove(-1, -1, -1);
+		}
 	}
 
 	public void place(int[] locs) {
@@ -56,7 +64,10 @@ public class Board {
 				wonOuters[i] = win(wonMiddles[i]);
 			}
 		}
-		// winner of game check TODO here
+		if (win(wonOuters) != 0) {
+			Display.running = false;
+			winner = win(wonOuters);
+		}
 	}
 
 	public int win(int[] locs) {
@@ -80,16 +91,19 @@ public class Board {
 			}
 		}
 
+		// TODO: SCAN FOR TIES
+
 		return BLANK;
 	}
-	
+
 	public int getWinnerMiddle(int out, int mid) {
 		return wonMiddles[out][mid];
 	}
+
 	public int getWinnerOuter(int out) {
 		return wonOuters[out];
 	}
-	
+
 	public int nextPlayer() {
 		int a = lastPlayer;
 		if (lastPlayer == X) {
@@ -99,7 +113,7 @@ public class Board {
 		}
 		return a;
 	}
-	
+
 	public int currentPlayer() {
 		return lastPlayer;
 	}

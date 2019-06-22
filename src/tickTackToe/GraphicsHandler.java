@@ -41,7 +41,7 @@ public class GraphicsHandler extends Canvas implements Runnable {
 
 	@Override
 	public void run() {
-		while (true) {
+		do {
 			if (lastMS + 1000 / FPSCAP < System.currentTimeMillis()) {
 				Graphics graphics;
 				try {
@@ -53,6 +53,15 @@ public class GraphicsHandler extends Canvas implements Runnable {
 				}
 				lastMS = System.currentTimeMillis();
 			}
+		} while (Display.running);
+
+		Graphics graphics;
+		try {
+			graphics = buffer.getDrawGraphics();
+			endscreen(graphics);
+			graphics.dispose();
+		} finally {
+			buffer.show();
 		}
 	}
 
@@ -166,33 +175,51 @@ public class GraphicsHandler extends Canvas implements Runnable {
 		}
 
 		if (display.isFocused() && this.getMousePosition() != null) {
-			Point mouse = this.getMousePosition();
-			double mouseX = display.displayBoardX((int) mouse.getX());
-			double mouseY = display.displayBoardY((int) mouse.getY());
-			// So that it only shows up if the mouse is in the current select-able space, or
-			// if there is no selection
-			if ((board.lastInner() == -1 && board.lastMiddle() == -1 && board.lastOuter() == -1)
-					|| (board.displayBoardX(board.lastMiddle(), board.lastInner(), 0) == mouseX - mouseX % 3
-							&& board.displayBoardY(board.lastMiddle(), board.lastInner(), 0) == mouseY - mouseY % 3)) {
-				double next1X = mouseX % 9 * 3;
-				double next1Y = mouseY % 9 * 3;
-				double next2X = mouseX % 3 * 9;
-				double next2Y = mouseY % 3 * 9;
+			try {
+				Point mouse = this.getMousePosition();
+				double mouseX = display.displayBoardX((int) mouse.getX());
+				double mouseY = display.displayBoardY((int) mouse.getY());
+				// So that it only shows up if the mouse is in the current select-able space, or
+				// if there is no selection
+				if (((board.lastInner() == -1 && board.lastMiddle() == -1 && board.lastOuter() == -1) || (board
+						.displayBoardX(board.lastMiddle(), board.lastInner(), 0) == mouseX - mouseX % 3
+						&& board.displayBoardY(board.lastMiddle(), board.lastInner(), 0) == mouseY - mouseY % 3))
+						&& board.getWinnerMiddle(Board.numBoardOuter((int) mouseX, (int) mouseY),
+								Board.numBoardMiddle((int) mouseX, (int) mouseY)) == 0
+						&& board.getWinnerOuter(Board.numBoardOuter((int) mouseX, (int) mouseY)) == 0) {
+					double next1X = mouseX % 9 * 3;
+					double next1Y = mouseY % 9 * 3;
+					double next2X = mouseX % 3 * 9;
+					double next2Y = mouseY % 3 * 9;
 
-				g.setColor(Color.CYAN);
-				g.drawRect((int) (mouseX * (width / 27.0)), (int) (mouseY * (height / 27.0)), width / 27, height / 27);
-				g.drawRect((int) (mouseX * (width / 27.0)) + 1, (int) (mouseY * (height / 27.0)) + 1, width / 27 - 2,
-						height / 27 - 2);
-				g.setColor(new Color(50, 50, 255));
-				g.drawRect((int) (next1X * (width / 27.0)), (int) (next1Y * (height / 27.0)), width / 9, height / 9);
-				g.drawRect((int) (next1X * (width / 27.0)) + 1, (int) (next1Y * (height / 27.0)) + 1, width / 9 - 2,
-						height / 9 - 2);
-				g.setColor(Color.BLUE);
-				g.drawRect((int) (next2X * (width / 27.0)), (int) (next2Y * (width / 27.0) - next2Y), width / 3,
-						height / 3);
-				g.drawRect((int) (next2X * (width / 27.0)) + 1, (int) (next2Y * (width / 27.0) - next2Y) + 1,
-						width / 3 - 2, height / 3 - 2);
+					g.setColor(Color.CYAN);
+					g.drawRect((int) (mouseX * (width / 27.0)), (int) (mouseY * (height / 27.0)), width / 27,
+							height / 27);
+					g.drawRect((int) (mouseX * (width / 27.0)) + 1, (int) (mouseY * (height / 27.0)) + 1,
+							width / 27 - 2, height / 27 - 2);
+					g.setColor(new Color(50, 50, 255));
+					g.drawRect((int) (next1X * (width / 27.0)), (int) (next1Y * (height / 27.0)), width / 9,
+							height / 9);
+					g.drawRect((int) (next1X * (width / 27.0)) + 1, (int) (next1Y * (height / 27.0)) + 1, width / 9 - 2,
+							height / 9 - 2);
+					g.setColor(Color.BLUE);
+					g.drawRect((int) (next2X * (width / 27.0)), (int) (next2Y * (width / 27.0) - next2Y), width / 3,
+							height / 3);
+					g.drawRect((int) (next2X * (width / 27.0)) + 1, (int) (next2Y * (width / 27.0) - next2Y) + 1,
+							width / 3 - 2, height / 3 - 2);
+				}
+			} catch (NullPointerException e) {
+				// Eh.
 			}
 		}
+	}
+
+	public void endscreen(Graphics g) {
+		if (board.winner == board.O) {
+			g.setColor(Color.GREEN);
+			g.fillOval(0, 0, this.getWidth(), this.getHeight());
+			g.setColor(Color.WHITE);
+			g.fillOval(20, 20, this.getWidth() - 40, this.getHeight() - 40);
+		} // TODO
 	}
 }

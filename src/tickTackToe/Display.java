@@ -10,6 +10,8 @@ import javax.swing.JFrame;
 public class Display extends JFrame implements MouseListener, MouseMotionListener {
 
 	private static final long serialVersionUID = 1L;
+	
+	public static boolean running;
 
 	private Board board;
 	private GraphicsHandler graphics;
@@ -20,7 +22,7 @@ public class Display extends JFrame implements MouseListener, MouseMotionListene
 	public Display() {
 		board = new Board();
 
-		boolean running = true;
+		running = true;
 
 		headerHeight = this.getHeight();
 		this.setTitle("Tic-Tac-Toe");
@@ -67,11 +69,16 @@ public class Display extends JFrame implements MouseListener, MouseMotionListene
 		int mid = Board.numBoardMiddle(x, y);
 		int in = Board.numBoardInner(x, y);
 		// TODO: Make this be just inner except when necessary
-		if (board.get(out, mid, in) == board.BLANK && ((out == board.lastMiddle() && mid == board.lastInner())
-				|| (board.lastOuter() == -1 && board.lastMiddle() == -1 && board.lastInner() == -1))) {
+		// This space is not taken
+		if (board.get(out, mid, in) == board.BLANK
+				// This space is allowed based on previous placement
+				&& ((out == board.lastMiddle() && mid == board.lastInner())
+						// Or, there is no requirements by previous placement
+						|| (board.lastOuter() == -1 && board.lastMiddle() == -1 && board.lastInner() == -1))
+				// This box is not won on any level
+				&& (board.getWinnerMiddle(out, mid) == 0 && board.getWinnerOuter(out) == 0)) {
 			board.place(out, mid, in);
 		}
-		board.checkWins();
 	}
 
 	@Override

@@ -8,6 +8,10 @@ public class Board {
 
 	private int[][][] board = new int[9][9][9];
 	// board[out][mid][in]
+
+	private int[][] wonMiddles = new int[9][9];
+	private int[] wonOuters = new int[9];
+
 	private int[] lastMove = new int[] { 0, 0, 0 };
 	// [0] = outermost grid, [1] = middle grid, and [2] = inner grid locations
 	private int lastPlayer = 2; // Start with x
@@ -23,7 +27,7 @@ public class Board {
 		set(locOuter, locMiddle, locInner, nextPlayer());
 		setLastMove(locOuter, locMiddle, locInner);
 	}
-	
+
 	public void place(int[] locs) {
 		if (locs.length == 3) {
 			if (locs[0] < 9 && locs[1] < 9 && locs[2] < 9) {
@@ -31,7 +35,7 @@ public class Board {
 			}
 		}
 	}
-	
+
 	/**
 	 * Places a marker on the board at the next location in the board.
 	 * 
@@ -41,6 +45,45 @@ public class Board {
 		place(lastMiddle(), lastInner(), locInner);
 	}
 
+	public void checkWins() {
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				if (wonMiddles[i][j] == 0) {
+					wonMiddles[i][j] = win(board[i][j]);
+				}
+			}
+			if (wonOuters[i] == 0) {
+				wonOuters[i] = win(wonMiddles[i]);
+			}
+		}
+		// winner of game check TODO here
+	}
+
+	public int win(int[] locs) {
+		for (int i = 0; i < 3; i++) {
+			// Each Horizontal
+			if (locs[3 * i] == locs[1 + 3 * i] && locs[1 + 3 * i] == locs[2 + 3 * i]) {
+				return locs[0 + 3 * i];
+				// Each Vertical
+			} else if (locs[i] == locs[i + 3] && locs[i + 3] == locs[i + 6]) {
+				return locs[i];
+			}
+		}
+		// Each diagonal
+		if ((locs[0] == locs[4] && locs[4] == locs[8]) || (locs[2] == locs[4] && locs[4] == locs[6])) {
+			return locs[4];
+		}
+
+		return 0;
+	}
+	
+	public int getWinnerMiddle(int out, int mid) {
+		return wonMiddles[out][mid];
+	}
+	public int getWinnerOuter(int out) {
+		return wonOuters[out];
+	}
+	
 	public int nextPlayer() {
 		int a = lastPlayer;
 		if (lastPlayer == X) {
@@ -70,9 +113,9 @@ public class Board {
 			}
 		}
 	}
-	
+
 	public void setLastMove(int outer, int middle, int inner) {
-		setLastMove(new int[] {outer, middle, inner});
+		setLastMove(new int[] { outer, middle, inner });
 	}
 
 	public String symbolOf(int value) {

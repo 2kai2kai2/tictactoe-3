@@ -27,10 +27,10 @@ public class Display extends JFrame implements MouseListener, MouseMotionListene
 		this.setSize(600, 600 + headerHeight);
 		graphics = new GraphicsHandler(board, this);
 		this.add(graphics);
-		
+
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setVisible(true);
-		
+
 		graphics.initialize();
 
 	}
@@ -47,7 +47,7 @@ public class Display extends JFrame implements MouseListener, MouseMotionListene
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
+
 	}
 
 	@Override
@@ -62,12 +62,13 @@ public class Display extends JFrame implements MouseListener, MouseMotionListene
 	public void mousePressed(MouseEvent e) {
 		int x = displayBoardX(e.getX());
 		int y = displayBoardY(e.getY());
-		
+
 		int out = Board.numBoardOuter(x, y);
 		int mid = Board.numBoardMiddle(x, y);
 		int in = Board.numBoardInner(x, y);
 		// TODO: Make this be just inner except when necessary
-		if (board.get(out, mid, in) == board.BLANK) {
+		if (board.get(out, mid, in) == board.BLANK && ((out == board.lastMiddle() && mid == board.lastInner())
+				|| (board.lastOuter() == -1 && board.lastMiddle() == -1 && board.lastInner() == -1))) {
 			board.place(out, mid, in);
 		}
 		board.checkWins();

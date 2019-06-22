@@ -12,7 +12,7 @@ public class Board {
 	private int[][] wonMiddles = new int[9][9];
 	private int[] wonOuters = new int[9];
 
-	private int[] lastMove = new int[] { 0, 0, 0 };
+	private int[] lastMove = new int[] { -1, -1, -1 };
 	// [0] = outermost grid, [1] = middle grid, and [2] = inner grid locations
 	private int lastPlayer = 2; // Start with x
 
@@ -48,11 +48,11 @@ public class Board {
 	public void checkWins() {
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
-				if (wonMiddles[i][j] == 0) {
+				if (wonMiddles[i][j] == BLANK) {
 					wonMiddles[i][j] = win(board[i][j]);
 				}
 			}
-			if (wonOuters[i] == 0) {
+			if (wonOuters[i] == BLANK) {
 				wonOuters[i] = win(wonMiddles[i]);
 			}
 		}
@@ -63,18 +63,24 @@ public class Board {
 		for (int i = 0; i < 3; i++) {
 			// Each Horizontal
 			if (locs[3 * i] == locs[1 + 3 * i] && locs[1 + 3 * i] == locs[2 + 3 * i]) {
-				return locs[0 + 3 * i];
+				if (locs[3 * i] != BLANK) {
+					return locs[3 * i];
+				}
 				// Each Vertical
 			} else if (locs[i] == locs[i + 3] && locs[i + 3] == locs[i + 6]) {
-				return locs[i];
+				if (locs[i] != BLANK) {
+					return locs[i];
+				}
 			}
 		}
 		// Each diagonal
 		if ((locs[0] == locs[4] && locs[4] == locs[8]) || (locs[2] == locs[4] && locs[4] == locs[6])) {
-			return locs[4];
+			if (locs[4] != BLANK) {
+				return locs[4];
+			}
 		}
 
-		return 0;
+		return BLANK;
 	}
 	
 	public int getWinnerMiddle(int out, int mid) {

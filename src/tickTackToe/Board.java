@@ -30,9 +30,9 @@ public class Board {
 		set(locOuter, locMiddle, locInner, nextPlayer());
 		setLastMove(locOuter, locMiddle, locInner);
 		checkWins();
-		//if (wonMiddles[locMiddle][locInner] != 0 || wonOuters[locMiddle] != 0) {
+		if (wonMiddles[locMiddle][locInner] != 0 || wonOuters[locMiddle] != 0) {
 			setLastMove(-1, -1, -1);
-		//}
+		}
 	}
 
 	public void place(int[] locs) {

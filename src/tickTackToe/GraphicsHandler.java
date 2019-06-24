@@ -2,6 +2,7 @@ package tickTackToe;
 
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferStrategy;
@@ -30,7 +31,8 @@ public class GraphicsHandler extends Canvas implements Runnable {
 	}
 
 	/**
-	 * To be called only after being added to the display
+	 * To be called only after being added to the display. Initializes values that
+	 * need to be started after this object is added to the JFrame.
 	 */
 	public void initialize() {
 		this.createBufferStrategy(3);
@@ -41,30 +43,29 @@ public class GraphicsHandler extends Canvas implements Runnable {
 
 	@Override
 	public void run() {
-		do {
+		Graphics graphics;
+		while (true) {
 			if (lastMS + 1000 / FPSCAP < System.currentTimeMillis()) {
-				Graphics graphics;
 				try {
 					graphics = buffer.getDrawGraphics();
 					draw(graphics);
+					if (!Display.running) {
+						endscreen(graphics);
+					}
 					graphics.dispose();
 				} finally {
 					buffer.show();
 				}
 				lastMS = System.currentTimeMillis();
 			}
-		} while (Display.running);
-
-		Graphics graphics;
-		try {
-			graphics = buffer.getDrawGraphics();
-			endscreen(graphics);
-			graphics.dispose();
-		} finally {
-			buffer.show();
 		}
 	}
 
+	/**
+	 * Draws the board and all contained objects & indicators.
+	 * 
+	 * @param g The Graphics object used for the display.
+	 */
 	public void draw(Graphics g) {
 		this.setSize(display.getContentPane().getSize());
 
@@ -147,7 +148,7 @@ public class GraphicsHandler extends Canvas implements Runnable {
 			}
 		}
 
-		if (board.lastInner() != -1 && board.lastMiddle() != -1 && board.lastOuter() != -1) {
+		if (board.lastInner() != -1 && board.lastMiddle() != -1 && board.lastOuter() != -1 && display.running) {
 			int next1X = Board.displayBoardX(board.lastMiddle(), board.lastInner(), 0);
 			int next1Y = Board.displayBoardY(board.lastMiddle(), board.lastInner(), 0);
 
@@ -174,7 +175,7 @@ public class GraphicsHandler extends Canvas implements Runnable {
 					height / 3 - 2);
 		}
 
-		if (display.isFocused() && this.getMousePosition() != null) {
+		if (display.isFocused() && this.getMousePosition() != null && display.running) {
 			try {
 				Point mouse = this.getMousePosition();
 				double mouseX = display.displayBoardX((int) mouse.getX());
@@ -214,12 +215,47 @@ public class GraphicsHandler extends Canvas implements Runnable {
 		}
 	}
 
-	public void endscreen(Graphics g) {
+	/**
+	 * Displays the end screen showing the winner or tie. NOTE: The Width and Height
+	 * of this object are used.
+	 * 
+	 * @param g The Graphics object used as a display.
+	 */
+	private void endscreen(Graphics g) {
 		if (board.winner == board.O) {
 			g.setColor(Color.GREEN);
-			g.fillOval(0, 0, this.getWidth(), this.getHeight());
+			for (int x = 0; x < this.getWidth(); x++) {
+				for (int y = 0; y < this.getHeight(); y++) {
+					int OX = x - this.getWidth() / 2;
+					int OY = y - this.getHeight() / 2;
+					if (Math.sqrt(OX * OX + OY * OY) < Math.min(this.getHeight(), this.getWidth()) / 2
+							&& Math.sqrt(OX * OX + OY * OY) > Math.min(this.getHeight(), this.getWidth()) / 2 - 20) {
+						g.drawRect(x, y, 1, 1);
+					}
+				}
+			}
 			g.setColor(Color.WHITE);
-			g.fillOval(20, 20, this.getWidth() - 40, this.getHeight() - 40);
-		} // TODO
+		} else if (board.winner == board.X) {
+			int size = Math.min(this.getWidth(), this.getHeight());
+			int offsetX = (this.getWidth() - size) / 2;
+			int offsetY = (this.getHeight() - size) / 2;
+			g.setColor(Color.RED);
+			g.fillPolygon(
+					new int[] { offsetX + 0, offsetX + 10, offsetX + size / 2, offsetX + size - 10, offsetX + size,
+							offsetX + size / 2 + 10, offsetX + size, offsetX + size - 10, offsetX + size / 2,
+							offsetX + 10, offsetX + 0, offsetX + size / 2 - 10 },
+					new int[] { offsetY + 10, offsetY + 0, offsetY + size / 2 - 10, offsetY + 0, offsetY + 10,
+							offsetY + size / 2, offsetY + size - 10, offsetY + size, offsetY + size / 2 + 10,
+							offsetY + size, offsetY + size - 10, offsetY + size / 2 },
+					12);
+
+		} else if (board.winner == board.TIE) {
+			// All the numbers in this are kinda finnicky
+			g.setColor(Color.YELLOW);
+			int sizeH = this.getHeight() / 2 * 3;
+			int sizeW = this.getWidth() / 13 * 7;
+			g.setFont(new Font(Font.MONOSPACED, Font.BOLD, Math.min(sizeH, sizeW)));
+			g.drawString("TIE", 0, Math.min(sizeH, sizeW) * 2 / 3);
+		}
 	}
 }

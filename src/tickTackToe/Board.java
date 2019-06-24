@@ -299,5 +299,4 @@ public class Board {
 		}
 		return out;
 	}
-
 }

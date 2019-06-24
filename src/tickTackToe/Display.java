@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 public class Display extends JFrame implements MouseListener, MouseMotionListener {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public static boolean running;
 
 	private Board board;
@@ -76,7 +76,8 @@ public class Display extends JFrame implements MouseListener, MouseMotionListene
 						// Or, there is no requirements by previous placement
 						|| (board.lastOuter() == -1 && board.lastMiddle() == -1 && board.lastInner() == -1))
 				// This box is not won on any level
-				&& (board.getWinnerMiddle(out, mid) == 0 && board.getWinnerOuter(out) == 0)) {
+				&& (board.getWinnerMiddle(out, mid) == board.BLANK && board.getWinnerOuter(out) == board.BLANK
+						&& board.winner == board.BLANK)) {
 			board.place(out, mid, in);
 		}
 	}

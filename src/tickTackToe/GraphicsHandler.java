@@ -97,9 +97,9 @@ public class GraphicsHandler extends Canvas implements Runnable {
 		// Draw symbols on induvidual squares
 		for (int i = 0; i < 27; i++) {
 			for (int j = 0; j < 27; j++) {
-				int out = board.numBoardOuter(i, j);
-				int mid = board.numBoardMiddle(i, j);
-				int in = board.numBoardInner(i, j);
+				int out = Board.numBoardOuter(i, j);
+				int mid = Board.numBoardMiddle(i, j);
+				int in = Board.numBoardInner(i, j);
 
 				int team = board.get(out, mid, in);
 				if (team == board.X) {
@@ -116,8 +116,8 @@ public class GraphicsHandler extends Canvas implements Runnable {
 		// Draw symbols on lower boxes
 		for (int i = 0; i < 27; i += 3) {
 			for (int j = 0; j < 27; j += 3) {
-				int out = board.numBoardOuter(i, j);
-				int mid = board.numBoardMiddle(i, j);
+				int out = Board.numBoardOuter(i, j);
+				int mid = Board.numBoardMiddle(i, j);
 
 				int team = board.getWinnerMiddle(out, mid);
 				if (team == board.X) {
@@ -133,7 +133,7 @@ public class GraphicsHandler extends Canvas implements Runnable {
 		// Draw symbols on larger boxes
 		for (int i = 0; i < 27; i += 9) {
 			for (int j = 0; j < 27; j += 9) {
-				int out = board.numBoardOuter(i, j);
+				int out = Board.numBoardOuter(i, j);
 
 				int team = board.getWinnerOuter(out);
 				if (team == board.X) {
@@ -148,8 +148,8 @@ public class GraphicsHandler extends Canvas implements Runnable {
 		}
 
 		if (board.lastInner() != -1 && board.lastMiddle() != -1 && board.lastOuter() != -1) {
-			int next1X = board.displayBoardX(board.lastMiddle(), board.lastInner(), 0);
-			int next1Y = board.displayBoardY(board.lastMiddle(), board.lastInner(), 0);
+			int next1X = Board.displayBoardX(board.lastMiddle(), board.lastInner(), 0);
+			int next1Y = Board.displayBoardY(board.lastMiddle(), board.lastInner(), 0);
 
 			if (board.currentPlayer() == board.O) {
 				g.setColor(Color.GREEN);
@@ -160,8 +160,8 @@ public class GraphicsHandler extends Canvas implements Runnable {
 			g.drawRect((int) (next1X * (width / 27.0)) + 1, (int) (next1Y * (height / 27.0)) + 1, width / 9 - 2,
 					height / 9 - 2);
 
-			int next2X = board.displayBoardX(board.lastInner(), 0, 0);
-			int next2Y = board.displayBoardY(board.lastInner(), 0, 0);
+			int next2X = Board.displayBoardX(board.lastInner(), 0, 0);
+			int next2Y = Board.displayBoardY(board.lastInner(), 0, 0);
 
 			if (board.currentPlayer() == board.O) {
 				g.setColor(Color.ORANGE);
@@ -181,9 +181,9 @@ public class GraphicsHandler extends Canvas implements Runnable {
 				double mouseY = display.displayBoardY((int) mouse.getY());
 				// So that it only shows up if the mouse is in the current select-able space, or
 				// if there is no selection
-				if (((board.lastInner() == -1 && board.lastMiddle() == -1 && board.lastOuter() == -1) || (board
+				if (((board.lastInner() == -1 && board.lastMiddle() == -1 && board.lastOuter() == -1) || (Board
 						.displayBoardX(board.lastMiddle(), board.lastInner(), 0) == mouseX - mouseX % 3
-						&& board.displayBoardY(board.lastMiddle(), board.lastInner(), 0) == mouseY - mouseY % 3))
+						&& Board.displayBoardY(board.lastMiddle(), board.lastInner(), 0) == mouseY - mouseY % 3))
 						&& board.getWinnerMiddle(Board.numBoardOuter((int) mouseX, (int) mouseY),
 								Board.numBoardMiddle((int) mouseX, (int) mouseY)) == 0
 						&& board.getWinnerOuter(Board.numBoardOuter((int) mouseX, (int) mouseY)) == 0) {

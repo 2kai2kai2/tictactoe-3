@@ -28,12 +28,11 @@ public class Board {
 	 */
 	public void place(int locOuter, int locMiddle, int locInner) {
 		set(locOuter, locMiddle, locInner, nextPlayer());
+		setLastMove(locOuter, locMiddle, locInner);
 		checkWins();
-		if (wonMiddles[locMiddle][locInner] == 0 && wonOuters[locMiddle] == 0) {
-			setLastMove(locOuter, locMiddle, locInner);
-		} else {
+		//if (wonMiddles[locMiddle][locInner] != 0 || wonOuters[locMiddle] != 0) {
 			setLastMove(-1, -1, -1);
-		}
+		//}
 	}
 
 	public void place(int[] locs) {
@@ -54,15 +53,11 @@ public class Board {
 	}
 
 	public void checkWins() {
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				if (wonMiddles[i][j] == BLANK) {
-					wonMiddles[i][j] = win(board[i][j]);
-				}
-			}
-			if (wonOuters[i] == BLANK) {
-				wonOuters[i] = win(wonMiddles[i]);
-			}
+		if (wonMiddles[lastOuter()][lastMiddle()] == BLANK) {
+				wonMiddles[lastOuter()][lastMiddle()] = win(board[lastOuter()][lastMiddle()]);
+		}
+		if (wonOuters[lastOuter()] == BLANK) {
+			wonOuters[lastOuter()] = win(wonMiddles[lastOuter()]);
 		}
 		if (win(wonOuters) != 0) {
 			Display.running = false;
@@ -91,9 +86,14 @@ public class Board {
 			}
 		}
 
-		// TODO: SCAN FOR TIES
-
-		return BLANK;
+		// Check if any spaces are open (no tie)
+		for (int i : locs) {
+			if (i == BLANK) {
+				return BLANK;
+			}
+		}
+		// If there are no more empty spots and no winner
+		return TIE;
 	}
 
 	public int getWinnerMiddle(int out, int mid) {

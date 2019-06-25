@@ -148,7 +148,8 @@ public class GraphicsHandler extends Canvas implements Runnable {
 			}
 		}
 
-		if (board.lastInner() != -1 && board.lastMiddle() != -1 && board.lastOuter() != -1 && display.running) {
+		// Shows the highlight of the upcoming required selection boxes
+		if (board.lastInner() >= 0 && board.lastMiddle() >= 0 && board.lastOuter() >= 0 && Display.running) {
 			int next1X = Board.displayBoardX(board.lastMiddle(), board.lastInner(), 0);
 			int next1Y = Board.displayBoardY(board.lastMiddle(), board.lastInner(), 0);
 
@@ -167,7 +168,7 @@ public class GraphicsHandler extends Canvas implements Runnable {
 			if (board.currentPlayer() == board.O) {
 				g.setColor(Color.ORANGE);
 			} else if (board.currentPlayer() == board.X) {
-				g.setColor(new Color(120, 200, 120));
+				g.setColor(new Color(120, 200, 120)); // Dark green
 			}
 			g.drawRect((int) (next2X * (width / 27.0)), (int) (next2Y * (width / 27.0) - next2Y), width / 3,
 					height / 3);
@@ -175,14 +176,15 @@ public class GraphicsHandler extends Canvas implements Runnable {
 					height / 3 - 2);
 		}
 
-		if (display.isFocused() && this.getMousePosition() != null && display.running) {
+		// Shows the highlight of the mouse-selected upcoming boxes.
+		if (display.isFocused() && this.getMousePosition() != null && Display.running) {
 			try {
 				Point mouse = this.getMousePosition();
 				double mouseX = display.displayBoardX((int) mouse.getX());
 				double mouseY = display.displayBoardY((int) mouse.getY());
 				// So that it only shows up if the mouse is in the current select-able space, or
 				// if there is no selection
-				if (((board.lastInner() == -1 && board.lastMiddle() == -1 && board.lastOuter() == -1) || (Board
+				if (((board.lastInner() < 0 && board.lastMiddle() < 0 && board.lastOuter() < 0) || (Board
 						.displayBoardX(board.lastMiddle(), board.lastInner(), 0) == mouseX - mouseX % 3
 						&& Board.displayBoardY(board.lastMiddle(), board.lastInner(), 0) == mouseY - mouseY % 3))
 						&& board.getWinnerMiddle(Board.numBoardOuter((int) mouseX, (int) mouseY),

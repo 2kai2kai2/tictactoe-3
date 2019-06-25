@@ -34,22 +34,30 @@ public class Display extends JFrame implements MouseListener, MouseMotionListene
 		this.setVisible(true);
 
 		graphics.initialize();
-
 	}
 
+	/**
+	 * Convert pixel to grid X coordinate.
+	 * 
+	 * @param pixX The X pixel on the display.
+	 * @return The X value on the grid (increment of smallest boxes).
+	 */
 	public int displayBoardX(int pixX) {
 		return (int) (pixX / ((double) graphics.getWidth() / 27));
-
 	}
 
+	/**
+	 * Convert pixel to grid Y coordinate.
+	 * 
+	 * @param pixX The Y pixel on the display.
+	 * @return The Y value on the grid (increment of smallest boxes).
+	 */
 	public int displayBoardY(int pixY) {
 		return (int) (pixY / ((double) graphics.getHeight() / 27));
-
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-
 	}
 
 	@Override
@@ -68,13 +76,13 @@ public class Display extends JFrame implements MouseListener, MouseMotionListene
 		int out = Board.numBoardOuter(x, y);
 		int mid = Board.numBoardMiddle(x, y);
 		int in = Board.numBoardInner(x, y);
-		// TODO: Make this be just inner except when necessary
+
 		// This space is not taken
 		if (board.get(out, mid, in) == board.BLANK
 				// This space is allowed based on previous placement
 				&& ((out == board.lastMiddle() && mid == board.lastInner())
 						// Or, there is no requirements by previous placement
-						|| (board.lastOuter() == -1 && board.lastMiddle() == -1 && board.lastInner() == -1))
+						|| (board.lastOuter() < 0 && board.lastMiddle() < 0 && board.lastInner() < 0))
 				// This box is not won on any level
 				&& (board.getWinnerMiddle(out, mid) == board.BLANK && board.getWinnerOuter(out) == board.BLANK
 						&& board.winner == board.BLANK)) {

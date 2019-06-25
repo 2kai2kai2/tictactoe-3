@@ -7,8 +7,7 @@ public class Board {
 	public final int O = 2;
 	public final int TIE = 3;
 
-	private int[][][] board = new int[9][9][9];
-	// board[out][mid][in]
+	private int[][][] board = new int[9][9][9]; // board[out][mid][in]
 
 	public int winner = 0;
 
@@ -17,6 +16,7 @@ public class Board {
 
 	private int[] lastMove = new int[] { -1, -1, -1 };
 	// [0] = outermost grid, [1] = middle grid, and [2] = inner grid locations
+
 	private int lastPlayer = 2; // Start with x
 
 	/**
@@ -35,6 +35,11 @@ public class Board {
 		}
 	}
 
+	/**
+	 * Places a marker on the board at any location.
+	 * 
+	 * @param locs An array of {outer, middle, inner} locations. Each 0-8.
+	 */
 	public void place(int[] locs) {
 		if (locs.length == 3) {
 			if (locs[0] < 9 && locs[1] < 9 && locs[2] < 9) {
@@ -52,19 +57,30 @@ public class Board {
 		place(lastMiddle(), lastInner(), locInner);
 	}
 
+	/**
+	 * Evaluates the wins on every level for the last move.
+	 */
 	public void checkWins() {
 		if (wonMiddles[lastOuter()][lastMiddle()] == BLANK) {
-				wonMiddles[lastOuter()][lastMiddle()] = win(board[lastOuter()][lastMiddle()]);
+			wonMiddles[lastOuter()][lastMiddle()] = win(board[lastOuter()][lastMiddle()]);
 		}
+
 		if (wonOuters[lastOuter()] == BLANK) {
 			wonOuters[lastOuter()] = win(wonMiddles[lastOuter()]);
 		}
+
 		if (win(wonOuters) != 0) {
 			Display.running = false;
 			winner = win(wonOuters);
 		}
 	}
 
+	/**
+	 * Evaluates an int array [9] (one box) to find the winner of the box.
+	 * 
+	 * @param locs The int array to be evaluated.
+	 * @return 0=none, 1=X, 2=O, 3=tie of the winner of the array as a box.
+	 */
 	public int win(int[] locs) {
 		for (int i = 0; i < 3; i++) {
 			// Each Horizontal
@@ -96,14 +112,32 @@ public class Board {
 		return TIE;
 	}
 
+	/**
+	 * Gets the winner of a middle-level box.
+	 * 
+	 * @param out The outer box (0-8) containing the middle box.
+	 * @param mid The middle box (0-8) within the selected outer box.
+	 * @return The int value of the winner of the selected middle level box.
+	 */
 	public int getWinnerMiddle(int out, int mid) {
 		return wonMiddles[out][mid];
 	}
 
+	/**
+	 * Gets the winner of an outer-level box.
+	 * 
+	 * @param out The outer box (0-8) to get the winner of.
+	 * @return The int value of the winner of the selected box.
+	 */
 	public int getWinnerOuter(int out) {
 		return wonOuters[out];
 	}
 
+	/**
+	 * Gets the next player for a turn and switches to the other.
+	 * 
+	 * @return The next player turn int value.
+	 */
 	public int nextPlayer() {
 		int a = lastPlayer;
 		if (lastPlayer == X) {
@@ -114,22 +148,49 @@ public class Board {
 		return a;
 	}
 
+	/**
+	 * Getter for the player int value.
+	 * 
+	 * @return The current player int value.
+	 */
 	public int currentPlayer() {
 		return lastPlayer;
 	}
 
+	/**
+	 * Getter for the last outer box move array location.
+	 * 
+	 * @return The array location of the last outer box placed in.
+	 */
 	public int lastOuter() {
 		return lastMove[0];
 	}
 
+	/**
+	 * Getter for the last middle box move array location.
+	 * 
+	 * @return The array location of the last middle box placed in within the last
+	 *         outer box.
+	 */
 	public int lastMiddle() {
 		return lastMove[1];
 	}
 
+	/**
+	 * Getter for the last inner box move array location.
+	 * 
+	 * @return The array location of the last inner box placed in within the last
+	 *         middle box..
+	 */
 	public int lastInner() {
 		return lastMove[2];
 	}
 
+	/**
+	 * Setter for the last move.
+	 * 
+	 * @param move The int[] {outer, middle, inner} locations to set the last move.
+	 */
 	public void setLastMove(int[] move) {
 		if (move.length == 3) {
 			if (move[0] < 9 && move[1] < 9 && move[2] < 9) {
@@ -138,20 +199,15 @@ public class Board {
 		}
 	}
 
+	/**
+	 * Setter for the last move.
+	 * 
+	 * @param outer  The outer box array location of the last move.
+	 * @param middle The middle box array location of the last move.
+	 * @param inner  The inner box array location of the last move.
+	 */
 	public void setLastMove(int outer, int middle, int inner) {
 		setLastMove(new int[] { outer, middle, inner });
-	}
-
-	public String symbolOf(int value) {
-		if (value == 1) {
-			return "X";
-		} else if (value == 2) {
-			return "O";
-		} else if (value == -1) {
-			return "?";
-		} else {
-			return "-";
-		}
 	}
 
 	/**
@@ -199,12 +255,12 @@ public class Board {
 	}
 
 	/**
-	 * todo javadoc
+	 * Gets the value of a spot on the board.
 	 * 
-	 * @param out
-	 * @param mid
-	 * @param in
-	 * @return
+	 * @param out The index locating the outer box (0-8)
+	 * @param mid The index locating the middle box (0-8)
+	 * @param in  The index locating the inner box (0-8)
+	 * @return The int value of the team that has the box.
 	 */
 	public int get(int out, int mid, int in) {
 		if (out < 9 && mid < 9 && in < 9) {
@@ -214,24 +270,13 @@ public class Board {
 	}
 
 	/**
-	 * todo javadoc
+	 * Gets the grid X index of the given array location.
 	 * 
-	 * @param out
-	 * @param mid
-	 * @param in
-	 * @return
+	 * @param out The index of the outer box.
+	 * @param mid The index of the middle box in the outer box.
+	 * @param in  The index of the inner box in the middle box.
+	 * @return The corresponding grid X index.
 	 */
-	public int get(int[] out, int[] mid, int[] in) {
-		if (out.length == 2 && mid.length == 2 && in.length == 2) {
-			if (out[0] <= 2 || out[1] <= 2 || mid[0] <= 2 || mid[1] <= 2 || in[0] <= 2 || in[1] <= 2) {
-				return get(out[0] + 3 * out[1], mid[0] + 3 * mid[1], in[0] + 3 * in[1]);
-			}
-			// If any of the x, y pairs are larger than the allowed side return -1.
-		}
-		// If it is not an x, y pair, return -1
-		return -1;
-	}
-
 	public static int displayBoardX(int out, int mid, int in) {
 		if (out < 9 && mid < 9 && in < 9) {
 			return out % 3 * 9 + mid % 3 * 3 + in % 3;
@@ -239,6 +284,14 @@ public class Board {
 		return -1;
 	}
 
+	/**
+	 * Gets the grid Y index of the given array location.
+	 * 
+	 * @param out The index of the outer box.
+	 * @param mid The index of the middle box in the outer box.
+	 * @param in  The index of the inner box in the middle box.
+	 * @return The corresponding grid Y index.
+	 */
 	public static int displayBoardY(int out, int mid, int in) {
 		if (out < 9 && mid < 9 && in < 9) {
 			return out / 3 * 9 + mid / 3 * 3 + in / 3;
@@ -246,30 +299,70 @@ public class Board {
 		return -1;
 	}
 
+	/**
+	 * Gets the outer box array location from the grid indexes
+	 * 
+	 * @param x The X grid index (0-26).
+	 * @param y The Y grid index (0-26).
+	 * @return The outer box array location (0-8).
+	 */
 	public static int numBoardOuter(int x, int y) {
-		if (x < 3 * 3 * 3 && y < 3 * 3 * 3) {
+		if (x < 27 && y < 27) {
 			return x / 9 + y / 9 * 3;
 		}
 		return -1;
 	}
 
+	/**
+	 * Gets the middle box array location from the grid indexes
+	 * 
+	 * @param x The X grid index (0-26).
+	 * @param y The Y grid index (0-26).
+	 * @return The middle box array location (0-8).
+	 */
 	public static int numBoardMiddle(int x, int y) {
-		if (x < 3 * 3 * 3 && y < 3 * 3 * 3) {
+		if (x < 27 && y < 27) {
 			return x % 9 / 3 + y % 9 / 3 * 3;
 		}
 		return -1;
 	}
 
+	/**
+	 * Gets the inner box array location from the grid indexes
+	 * 
+	 * @param x The X grid index (0-26).
+	 * @param y The Y grid index (0-26).
+	 * @return The inner box array location (0-8).
+	 */
 	public static int numBoardInner(int x, int y) {
-		if (x < 3 * 3 * 3 && y < 3 * 3 * 3) {
+		if (x < 27 && y < 27) {
 			return x % 3 + y % 3 * 3;
 		}
 		return -1;
 	}
 
 	/**
+	 * Gets the String representation of a team.
+	 * 
+	 * @param value The int value of the team.
+	 * @return The String (length 1) value of the team.
+	 */
+	public String symbolOf(int value) {
+		if (value == X) {
+			return "X";
+		} else if (value == O) {
+			return "O";
+		} else if (value == BLANK) {
+			return "-";
+		} else {
+			return "?";
+		}
+	}
+
+	/**
 	 * Creates a text-based representation of the board.
 	 * 
+	 * @deprecated
 	 * @return A multiline string containing a text-graphic of the board.
 	 */
 	public String out() {

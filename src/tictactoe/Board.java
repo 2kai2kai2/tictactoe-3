@@ -1,6 +1,4 @@
-package tickTackToe;
-
-import org.jetbrains.annotations.NotNull;
+package tictactoe;
 
 public class Board {
 
@@ -60,7 +58,7 @@ public class Board {
 	 * @param locs The int array to be evaluated.
 	 * @return 0=none, 1=X, 2=O, 3=tie of the winner of the array as a box.
 	 */
-	public int evaluateWinner(int @NotNull [] locs) {
+	public int evaluateWinner(int[] locs) {
 		for (int i = 0; i < 3; i++) {
 			// Each Horizontal
 			if (locs[3 * i] == locs[1 + 3 * i] && locs[1 + 3 * i] == locs[2 + 3 * i]) {
@@ -179,7 +177,7 @@ public class Board {
 	 *
 	 * @throws AssertionError If move is not three ints between 0 and 8.
 	 */
-	public void setLastMove(int @NotNull [] move) {
+	public void setLastMove(int[] move) {
 		assert(move.length == 3);
 		assert(0 <= move[0] && move[0] < 9);
 		assert(0 <= move[1] && move[1] < 9);
@@ -329,6 +327,7 @@ public class Board {
 	 * @deprecated
 	 * @return A multiline string containing a text-graphic of the board.
 	 */
+	@Deprecated
 	public String out() {
 		StringBuilder out = new StringBuilder("=========================================================================\n");
 		String[] rows = new String[3 * 3 * 3];

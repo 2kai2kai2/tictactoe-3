@@ -1,6 +1,4 @@
-package tickTackToe;
-
-import org.jetbrains.annotations.NotNull;
+package tictactoe;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -64,7 +62,7 @@ public class GraphicsHandler extends Canvas implements Runnable {
      *
      * @param g The Graphics object used for the display.
      */
-    public void draw(@NotNull Graphics2D g) {
+    public void draw(Graphics2D g) {
         this.setSize(display.getContentPane().getSize());
 
         int width = this.getWidth();
@@ -245,7 +243,7 @@ public class GraphicsHandler extends Canvas implements Runnable {
      *
      * @param g The Graphics2D object used as a display.
      */
-    private void endscreen(@NotNull Graphics2D g) {
+    private void endscreen(Graphics2D g) {
         int size = Math.min(this.getWidth(), this.getHeight());
         switch (board.winner) {
             case Board.O -> {

@@ -1,11 +1,13 @@
-# Tic-Tac-Toe^3
+# Three-Level Tic-Tac-Toe
 
 ![Code Size](https://img.shields.io/github/languages/code-size/2kai2kai2/tictactoe-3?logo=github)
-![Code Quality](https://img.shields.io/scrutinizer/quality/g/2kai2kai2/tictactoe-3?logo=scrutinizer&logoColor=white)
-![Build Status](https://img.shields.io/scrutinizer/build/g/2kai2kai2/tictactoe-3?logo=scrutinizer&logoColor=white)
 [
-![Version](https://img.shields.io/github/v/release/2kai2kai2/tictactoe-3?display_name=tag&logo=github)
+![GitHub Build](https://img.shields.io/github/workflow/status/2kai2kai2/tictactoe-3/build_release?logo=github)
+](https://github.com/2kai2kai2/tictactoe-3/actions/workflows/build_release.yml)
+[
+![Latest Release](https://img.shields.io/github/v/release/2kai2kai2/tictactoe-3?display_name=tag&logo=github)
 ](https://github.com/2kai2kai2/tictactoe-3/releases/latest)
+![Code Quality](https://img.shields.io/scrutinizer/quality/g/2kai2kai2/tictactoe-3?logo=scrutinizer&logoColor=white)
 [
 ![License AGPL-3.0](https://img.shields.io/github/license/2kai2kai2/tictactoe-3?color=blue)
 ](https://github.com/2kai2kai2/tictactoe-3/blob/master/LICENSE)

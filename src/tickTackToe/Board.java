@@ -1,18 +1,19 @@
 package tickTackToe;
 
+import org.jetbrains.annotations.NotNull;
+
 public class Board {
 
-	public final int BLANK = 0;
-	public final int X = 1;
-	public final int O = 2;
-	public final int TIE = 3;
+	public static final int BLANK = 0;
+	public static final int X = 1;
+	public static final int O = 2;
+	public static final int TIE = 3;
 
-	private int[][][] board = new int[9][9][9]; // board[out][mid][in]
+	private final int[][][] board = new int[9][9][9]; // board[out][mid][in]
 
+	private final int[][] wonMiddles = new int[9][9];
+	private final int[] wonOuters = new int[9];
 	public int winner = 0;
-
-	private int[][] wonMiddles = new int[9][9];
-	private int[] wonOuters = new int[9];
 
 	private int[] lastMove = new int[] { -1, -1, -1 };
 	// [0] = outermost grid, [1] = middle grid, and [2] = inner grid locations
@@ -36,42 +37,20 @@ public class Board {
 	}
 
 	/**
-	 * Places a marker on the board at any location.
-	 * 
-	 * @param locs An array of {outer, middle, inner} locations. Each 0-8.
-	 */
-	public void place(int[] locs) {
-		if (locs.length == 3) {
-			if (locs[0] < 9 && locs[1] < 9 && locs[2] < 9) {
-				place(locs[0], locs[1], locs[2]);
-			}
-		}
-	}
-
-	/**
-	 * Places a marker on the board at the next location in the board.
-	 * 
-	 * @param locInner The integer location (0-8) within the current middle square.
-	 */
-	public void place(int locInner) {
-		place(lastMiddle(), lastInner(), locInner);
-	}
-
-	/**
 	 * Evaluates the wins on every level for the last move.
 	 */
 	public void checkWins() {
 		if (wonMiddles[lastOuter()][lastMiddle()] == BLANK) {
-			wonMiddles[lastOuter()][lastMiddle()] = win(board[lastOuter()][lastMiddle()]);
+			wonMiddles[lastOuter()][lastMiddle()] = evaluateWinner(board[lastOuter()][lastMiddle()]);
 		}
 
 		if (wonOuters[lastOuter()] == BLANK) {
-			wonOuters[lastOuter()] = win(wonMiddles[lastOuter()]);
+			wonOuters[lastOuter()] = evaluateWinner(wonMiddles[lastOuter()]);
 		}
 
-		if (win(wonOuters) != 0) {
+		if (evaluateWinner(wonOuters) != 0) {
 			Display.running = false;
-			winner = win(wonOuters);
+			winner = evaluateWinner(wonOuters);
 		}
 	}
 
@@ -81,15 +60,16 @@ public class Board {
 	 * @param locs The int array to be evaluated.
 	 * @return 0=none, 1=X, 2=O, 3=tie of the winner of the array as a box.
 	 */
-	public int win(int[] locs) {
+	public int evaluateWinner(int @NotNull [] locs) {
 		for (int i = 0; i < 3; i++) {
 			// Each Horizontal
 			if (locs[3 * i] == locs[1 + 3 * i] && locs[1 + 3 * i] == locs[2 + 3 * i]) {
 				if (locs[3 * i] != BLANK) {
 					return locs[3 * i];
 				}
-				// Each Vertical
-			} else if (locs[i] == locs[i + 3] && locs[i + 3] == locs[i + 6]) {
+			}
+			// Each Vertical
+			if (locs[i] == locs[i + 3] && locs[i + 3] == locs[i + 6]) {
 				if (locs[i] != BLANK) {
 					return locs[i];
 				}
@@ -118,6 +98,8 @@ public class Board {
 	 * @param out The outer box (0-8) containing the middle box.
 	 * @param mid The middle box (0-8) within the selected outer box.
 	 * @return The int value of the winner of the selected middle level box.
+	 *
+	 * @throws ArrayIndexOutOfBoundsException If out or mid are invalid indexes (0-8).
 	 */
 	public int getWinnerMiddle(int out, int mid) {
 		return wonMiddles[out][mid];
@@ -128,6 +110,8 @@ public class Board {
 	 * 
 	 * @param out The outer box (0-8) to get the winner of.
 	 * @return The int value of the winner of the selected box.
+	 *
+	 * @throws ArrayIndexOutOfBoundsException If out or mid are invalid indexes (0-8).
 	 */
 	public int getWinnerOuter(int out) {
 		return wonOuters[out];
@@ -137,14 +121,16 @@ public class Board {
 	 * Gets the next player for a turn and switches to the other.
 	 * 
 	 * @return The next player turn int value.
+	 *
+	 * @throws IllegalStateException If the previous value of lastPlayer was invalid.
 	 */
 	public int nextPlayer() {
 		int a = lastPlayer;
-		if (lastPlayer == X) {
-			lastPlayer = O;
-		} else if (lastPlayer == O) {
-			lastPlayer = X;
-		}
+		lastPlayer = switch (lastPlayer) {
+			case X -> O;
+			case O -> X;
+			default -> throw new IllegalStateException("Cannot switch lastPlayer because the current value is invalid.");
+		};
 		return a;
 	}
 
@@ -180,7 +166,7 @@ public class Board {
 	 * Getter for the last inner box move array location.
 	 * 
 	 * @return The array location of the last inner box placed in within the last
-	 *         middle box..
+	 *         middle box.
 	 */
 	public int lastInner() {
 		return lastMove[2];
@@ -190,13 +176,15 @@ public class Board {
 	 * Setter for the last move.
 	 * 
 	 * @param move The int[] {outer, middle, inner} locations to set the last move.
+	 *
+	 * @throws AssertionError If move is not three ints between 0 and 8.
 	 */
-	public void setLastMove(int[] move) {
-		if (move.length == 3) {
-			if (move[0] < 9 && move[1] < 9 && move[2] < 9) {
-				lastMove = move;
-			}
-		}
+	public void setLastMove(int @NotNull [] move) {
+		assert(move.length == 3);
+		assert(0 <= move[0] && move[0] < 9);
+		assert(0 <= move[1] && move[1] < 9);
+		assert(0 <= move[2] && move[2] < 9);
+		lastMove = move;
 	}
 
 	/**
@@ -211,47 +199,15 @@ public class Board {
 	}
 
 	/**
-	 * Sets all values on the board back to blank (0).
-	 */
-	public void reset() {
-		for (int[][] i : board) {
-			for (int[] j : i) {
-				for (int k : j) {
-					k = BLANK;
-				}
-			}
-		}
-	}
-
-	/**
 	 * Sets the value of a spot on the board.
 	 * 
 	 * @param out The area of the outermost board
 	 * @param mid The area on the middle-size board within out
 	 * @param in  The spot on the smallest board within mid
+	 * @param team The team (final int X or O) to give the tile to.
 	 */
 	public void set(int out, int mid, int in, int team) {
 		board[out][mid][in] = team;
-	}
-
-	/**
-	 * Sets the value of a spot on the board.
-	 * 
-	 * @param out The x, y values for the location of the middle board from the top
-	 *            left of the outermost board
-	 * @param mid The x, y values for the location of the smallest board from the
-	 *            top left of the middle board
-	 * @param in  The x, y values for the spot on the smallest board from the top
-	 *            left
-	 */
-	public void set(int[] out, int[] mid, int[] in, int team) {
-		// If any of the x, y pairs are larger than the allowed side, do nothing.
-		if (out.length == 2 && mid.length == 2 && in.length == 2) {
-			// If it is not an x, y pair, just do nothing
-			if (out[0] > 2 || out[1] > 2 || mid[0] > 2 || mid[1] > 2 || in[0] > 2 || in[1] > 2) {
-				set(out[0] + 3 * out[1], mid[0] + 3 * mid[1], in[0] + 3 * in[1], team);
-			}
-		}
 	}
 
 	/**
@@ -261,12 +217,14 @@ public class Board {
 	 * @param mid The index locating the middle box (0-8)
 	 * @param in  The index locating the inner box (0-8)
 	 * @return The int value of the team that has the box.
+	 *
+	 * @throws AssertionError If the board location is invalid.
 	 */
 	public int get(int out, int mid, int in) {
-		if (out < 9 && mid < 9 && in < 9) {
-			return board[out][mid][in];
-		}
-		return -1;
+		assert(0 <= out && out < 9);
+		assert(0 <= mid && mid < 9);
+		assert(0 <= in && in < 9);
+		return board[out][mid][in];
 	}
 
 	/**
@@ -276,12 +234,14 @@ public class Board {
 	 * @param mid The index of the middle box in the outer box.
 	 * @param in  The index of the inner box in the middle box.
 	 * @return The corresponding grid X index.
+	 *
+	 * @throws AssertionError If the board location is invalid.
 	 */
 	public static int displayBoardX(int out, int mid, int in) {
-		if (out < 9 && mid < 9 && in < 9) {
-			return out % 3 * 9 + mid % 3 * 3 + in % 3;
-		}
-		return -1;
+		assert(0 <= out && out < 9);
+		assert(0 <= mid && mid < 9);
+		assert(0 <= in && in < 9);
+		return out % 3 * 9 + mid % 3 * 3 + in % 3;
 	}
 
 	/**
@@ -291,12 +251,14 @@ public class Board {
 	 * @param mid The index of the middle box in the outer box.
 	 * @param in  The index of the inner box in the middle box.
 	 * @return The corresponding grid Y index.
+	 *
+	 * @throws AssertionError If the board location is invalid.
 	 */
 	public static int displayBoardY(int out, int mid, int in) {
-		if (out < 9 && mid < 9 && in < 9) {
-			return out / 3 * 9 + mid / 3 * 3 + in / 3;
-		}
-		return -1;
+		assert(0 <= out && out < 9);
+		assert(0 <= mid && mid < 9);
+		assert(0 <= in && in < 9);
+		return (out / 3) * 9 + (mid / 3) * 3 + in / 3;
 	}
 
 	/**
@@ -305,12 +267,13 @@ public class Board {
 	 * @param x The X grid index (0-26).
 	 * @param y The Y grid index (0-26).
 	 * @return The outer box array location (0-8).
+	 *
+	 * @throws AssertionError If either grid index is invalid.
 	 */
 	public static int numBoardOuter(int x, int y) {
-		if (x < 27 && y < 27) {
-			return x / 9 + y / 9 * 3;
-		}
-		return -1;
+		assert(0 <= x && x < 27);
+		assert(0 <= y && y < 27);
+		return x / 9 + (y / 9) * 3;
 	}
 
 	/**
@@ -319,12 +282,13 @@ public class Board {
 	 * @param x The X grid index (0-26).
 	 * @param y The Y grid index (0-26).
 	 * @return The middle box array location (0-8).
+	 *
+	 * @throws AssertionError If either grid index is invalid.
 	 */
 	public static int numBoardMiddle(int x, int y) {
-		if (x < 27 && y < 27) {
-			return x % 9 / 3 + y % 9 / 3 * 3;
-		}
-		return -1;
+		assert(0 <= x && x < 27);
+		assert(0 <= y && y < 27);
+		return ((x % 9) / 3) + ((y % 9) / 3) * 3;
 	}
 
 	/**
@@ -333,12 +297,13 @@ public class Board {
 	 * @param x The X grid index (0-26).
 	 * @param y The Y grid index (0-26).
 	 * @return The inner box array location (0-8).
+	 *
+	 * @throws AssertionError If either grid index is invalid.
 	 */
 	public static int numBoardInner(int x, int y) {
-		if (x < 27 && y < 27) {
-			return x % 3 + y % 3 * 3;
-		}
-		return -1;
+		assert(0 <= x && x < 27);
+		assert(0 <= y && y < 27);
+		return x % 3 + y % 3 * 3;
 	}
 
 	/**
@@ -346,17 +311,16 @@ public class Board {
 	 * 
 	 * @param value The int value of the team.
 	 * @return The String (length 1) value of the team.
+	 *
+	 * @throws IllegalStateException If the value is not 0=BLANK, 1=X, or 2=O.
 	 */
 	public String symbolOf(int value) {
-		if (value == X) {
-			return "X";
-		} else if (value == O) {
-			return "O";
-		} else if (value == BLANK) {
-			return "-";
-		} else {
-			return "?";
-		}
+		return switch (value) {
+			case X -> "X";
+			case O -> "O";
+			case BLANK -> "-";
+			default -> throw new IllegalStateException("Team " + value + " is invalid (must be 0=BLANK, 1=X, 2=O).");
+		};
 	}
 
 	/**
@@ -366,7 +330,7 @@ public class Board {
 	 * @return A multiline string containing a text-graphic of the board.
 	 */
 	public String out() {
-		String out = "=========================================================================\n";
+		StringBuilder out = new StringBuilder("=========================================================================\n");
 		String[] rows = new String[3 * 3 * 3];
 		for (int i = 0; i < 3 * 3 * 3; i++) {
 			rows[i] = "[ ";
@@ -383,13 +347,13 @@ public class Board {
 			}
 		}
 		for (int i = 0; i < 3 * 3 * 3; i++) {
-			out += rows[i] + "\n";
+			out.append(rows[i]).append("\n");
 			if (i % 9 == 8) {
-				out += "=========================================================================\n";
+				out.append("=========================================================================\n");
 			} else if (i % 3 == 2) {
-				out += "-------------------------------------------------------------------------\n";
+				out.append("-------------------------------------------------------------------------\n");
 			}
 		}
-		return out;
+		return out.toString();
 	}
 }

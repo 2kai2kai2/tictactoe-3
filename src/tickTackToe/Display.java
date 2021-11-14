@@ -25,7 +25,7 @@ public class Display extends JFrame implements MouseListener, MouseMotionListene
 		running = true;
 
 		headerHeight = this.getHeight();
-		this.setTitle("Tic-Tac-Toe");
+		this.setTitle("Tic-Tac-Toe^3");
 		this.setSize(600, 600 + headerHeight);
 		graphics = new GraphicsHandler(board, this);
 		this.add(graphics);
